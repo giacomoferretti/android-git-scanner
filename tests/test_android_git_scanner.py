@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from android_git_scanner.utils import cleanup_version, extract_oat_version
+from android_git_scanner.utils import cleanup_version, extract_oat_version, extract_vdex_version
 
 
 def test_extract_oat_version():
@@ -41,6 +41,44 @@ def test_extract_oat_version():
     data = "static constexpr std::array<uint8_t, 4> kOatVersion{{'2', '4', '4', '\\0'}};"
     assert extract_oat_version(data) == "244"
 
+    # Wrong
+    wrong_lines = [
+        "static constexpr std::array<uint8_t, 4> kOatVersion { { '1', '7', '230', '\\0' } };",
+        "static constexpr uint8_t kOatVersion[] = { '20', '6', '4', '\\0' };",
+    ]
+    for x in wrong_lines:
+        assert extract_oat_version(x) is None
+
+
+def test_extract_vdex_version():
+    # 8.0.0
+    data = "static constexpr uint8_t kVdexVersion[] = { '0', '0', '6', '\\0' };"
+    assert extract_vdex_version(data) == "006"
+
+    # 8.1.0
+    data = "static constexpr uint8_t kVdexVersion[] = { '0', '1', '0', '\\0' };"
+    assert extract_vdex_version(data) == "010"
+
+    # 9.0.0
+    data = "static constexpr uint8_t kVerifierDepsVersion[] = { '0', '1', '9', '\\0' };"
+    assert extract_vdex_version(data) == "019"
+
+    # 10.0.0
+    data = "static constexpr uint8_t kVerifierDepsVersion[] = { '0', '2', '1', '\\0' };"
+    assert extract_vdex_version(data) == "021"
+
+    # 12.0.0
+    data = "static constexpr uint8_t kVdexVersion[] = { '0', '2', '7', '\\0' };"
+    assert extract_vdex_version(data) == "027"
+
+    # Wrong
+    wrong_lines = [
+        "static constexpr uint8_t kVerifierDepsVersion[] = { '10', '2', '123', '\\0' };",
+        "static constexpr uint8_t kVdexVersion[] = { '0', '243', '7', '\\0' };",
+    ]
+    for x in wrong_lines:
+        assert extract_vdex_version(x) is None
+
 
 def test_cleanup_version():
     # 4.4
@@ -66,3 +104,8 @@ def test_cleanup_version():
     # 15.0.0
     data = "'2', '4', '4', '\\0'"
     assert cleanup_version(data) == "244"
+
+    # Wrong
+    wrong_lines = ["'x', 'x', 'x', '\\0'", "'1', '23', '4', '\\0'"]
+    for x in wrong_lines:
+        assert cleanup_version(x) is None
