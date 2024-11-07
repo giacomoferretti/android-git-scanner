@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "android-git-scanner"
+version = "0.1.0"
+description = "A tool to scan the entire git history of Android `art` repository."
+authors = ["Giacomo Ferretti <giacomo.ferretti.00@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^8.1.7"
+gitpython = "^3.1.43"
+packaging = "^24.1"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.3"
+
+[tool.poetry.scripts]
+ags = "android_git_scanner.__main__:cli"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

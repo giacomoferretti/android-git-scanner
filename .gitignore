@@ -1,0 +1,14 @@
+# Packages
+/dist/*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv
+
+# App related
+# oat_versions.json
+# vdex_versions.json
