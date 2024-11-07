@@ -38,9 +38,7 @@ def test_extract_oat_version():
     assert extract_oat_version(data) == "170"
 
     # 15.0.0
-    data = (
-        "static constexpr std::array<uint8_t, 4> kOatVersion{{'2', '4', '4', '\\0'}};"
-    )
+    data = "static constexpr std::array<uint8_t, 4> kOatVersion{{'2', '4', '4', '\\0'}};"
     assert extract_oat_version(data) == "244"
 
 

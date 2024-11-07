@@ -91,8 +91,6 @@ def oat(git_folder, output, invert):
         else:
             output_data = dict(
                 (version, sorted(list(items)))
-                for version, items in sorted(
-                    android_versions.items(), key=lambda x: parse(x[0])
-                )
+                for version, items in sorted(android_versions.items(), key=lambda x: parse(x[0]))
             )
         json.dump(output_data, f, separators=(",", ":"))
