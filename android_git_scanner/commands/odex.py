@@ -54,7 +54,8 @@ def find_oat_version_file(commit: Commit):
 @click.command(name="oat")
 @click.argument("git-folder", type=click.Path(exists=True))
 @click.option("--output", type=click.Path(), default="oat_versions.json")
-def oat(git_folder, output):
+@click.option("--invert", help="Invert the output", is_flag=True)
+def oat(git_folder, output, invert):
     git_folder = pathlib.Path(git_folder)
 
     repo = Repo(git_folder)
@@ -70,16 +71,28 @@ def oat(git_folder, output):
         if android_version_match:
             android_version, android_version_revision = android_version_match
 
-            if android_version not in android_versions:
-                android_versions[android_version] = set()
+            if invert:
+                if oat_version not in android_versions:
+                    android_versions[oat_version] = set()
 
-            android_versions[android_version].add(oat_version)
+                android_versions[oat_version].add(android_version)
+            else:
+                if android_version not in android_versions:
+                    android_versions[android_version] = set()
+
+                android_versions[android_version].add(oat_version)
 
     with open(output, "w") as f:
-        output_data = dict(
-            (version, sorted(list(items)))
-            for version, items in sorted(
-                android_versions.items(), key=lambda x: parse(x[0])
+        if invert:
+            output_data = dict(
+                (key, sorted(list(values), key=parse) if values else [])
+                for key, values in sorted(android_versions.items())
             )
-        )
+        else:
+            output_data = dict(
+                (version, sorted(list(items)))
+                for version, items in sorted(
+                    android_versions.items(), key=lambda x: parse(x[0])
+                )
+            )
         json.dump(output_data, f, separators=(",", ":"))
